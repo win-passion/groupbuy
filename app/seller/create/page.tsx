@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import RequireRole from "../../components/RequireRole";
-import { addSellerDeal } from "../../lib/seller-deals";
+import { addSellerDeal, DEFAULT_DEAL_IMAGE } from "../../lib/seller-deals";
 
 function CreateDealForm() {
   const router = useRouter();
@@ -14,6 +14,7 @@ function CreateDealForm() {
   const [priceAt20, setPriceAt20] = useState("");
   const [priceAt50, setPriceAt50] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [image, setImage] = useState("");
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -21,6 +22,7 @@ function CreateDealForm() {
     addSellerDeal({
       name,
       description,
+      image: image.trim() || undefined,
       normalPrice: Number(normalPrice),
       priceAt20: Number(priceAt20),
       priceAt50: Number(priceAt50),
@@ -64,6 +66,19 @@ function CreateDealForm() {
               className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-orange-500"
               required
             />
+          </label>
+
+          <label className="block text-sm font-bold">
+            Product Image URL
+            <input
+              value={image}
+              onChange={(event) => setImage(event.target.value)}
+              placeholder={DEFAULT_DEAL_IMAGE}
+              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-orange-500"
+            />
+            <span className="mt-1 block text-xs font-normal text-gray-500">
+              Optional. Use a path like {DEFAULT_DEAL_IMAGE}
+            </span>
           </label>
 
           <label className="block text-sm font-bold">

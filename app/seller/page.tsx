@@ -83,45 +83,64 @@ function SellerDashboard() {
           {deals.map((deal) => {
             const progress = Math.min((deal.joined / 50) * 100, 100);
             const currentPrice = getCurrentPrice(deal);
+            const active = isDealActive(deal);
 
             return (
               <div
                 key={deal.id}
                 className="rounded-[28px] bg-white p-6 shadow-sm"
               >
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-col gap-6 md:flex-row md:items-center">
+                  <div className="flex h-32 w-full items-center justify-center overflow-hidden rounded-2xl bg-white md:w-36">
+                    <img
+                      src={deal.image}
+                      alt={deal.name}
+                      className="h-full w-full object-contain p-3"
+                    />
+                  </div>
+
                   <div className="flex-1">
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-bold ${
-                        isDealActive(deal)
+                        active
                           ? "bg-green-50 text-green-600"
                           : "bg-gray-100 text-gray-500"
                       }`}
                     >
-                      {isDealActive(deal) ? "● Active" : "Ended"}
+                      {active ? "● Active" : "Ended"}
                     </span>
+
                     <h3 className="mt-3 text-xl font-black">{deal.name}</h3>
+
                     <p className="mt-1 text-sm text-gray-500 line-clamp-2">
                       {deal.description}
                     </p>
-                    <p className="mt-3 text-2xl font-black text-orange-500">
+
+                    <p className="mt-3 text-sm text-gray-500">
+                      Current Group Price
+                    </p>
+
+                    <p className="mt-1 text-2xl font-black text-orange-500">
                       ฿{currentPrice.toLocaleString()}
                     </p>
+
+                    <div className="mt-5">
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>👥 {deal.joined}/50 joined</span>
+                        <span>Ends {deal.endDate}</span>
+                      </div>
+
+                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-100">
+                        <div
+                          className="h-full rounded-full bg-orange-500"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="w-full md:max-w-xs">
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>
-                        👥 {deal.joined}/50 joined
-                      </span>
-                      <span>Ends {deal.endDate}</span>
-                    </div>
-                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-100">
-                      <div
-                        className="h-full rounded-full bg-orange-500"
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
+                  <div className="rounded-xl border border-gray-200 px-5 py-3 text-center text-sm font-bold text-slate-700">
+                    {deal.orders} orders
                   </div>
                 </div>
               </div>

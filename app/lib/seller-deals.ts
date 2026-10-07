@@ -1,7 +1,10 @@
+export const DEFAULT_DEAL_IMAGE = "/assets/earphone.jpeg";
+
 export type SellerDeal = {
   id: string;
   name: string;
   description: string;
+  image: string;
   normalPrice: number;
   priceAt20: number;
   priceAt50: number;
@@ -17,6 +20,7 @@ const seedDeals: SellerDeal[] = [
     id: "seed-1",
     name: "Portable Blender",
     description: "Blend smoothies anywhere with USB recharge.",
+    image: "/assets/Boncafe-Drip-Coffee-Maker-1.jpg",
     normalPrice: 890,
     priceAt20: 690,
     priceAt50: 590,
@@ -28,6 +32,7 @@ const seedDeals: SellerDeal[] = [
     id: "seed-2",
     name: "Yoga Mat Bundle",
     description: "Non-slip mat with carry strap included.",
+    image: "/assets/skincareset.jpeg",
     normalPrice: 1290,
     priceAt20: 990,
     priceAt50: 790,
@@ -47,6 +52,10 @@ function normalizeDeal(raw: Partial<SellerDeal>, index: number): SellerDeal {
     id: typeof raw.id === "string" && raw.id ? raw.id : `deal-${index}`,
     name: typeof raw.name === "string" ? raw.name : "Untitled deal",
     description: typeof raw.description === "string" ? raw.description : "",
+    image:
+      typeof raw.image === "string" && raw.image
+        ? raw.image
+        : DEFAULT_DEAL_IMAGE,
     normalPrice: toFiniteNumber(raw.normalPrice),
     priceAt20: toFiniteNumber(raw.priceAt20),
     priceAt50: toFiniteNumber(raw.priceAt50),
@@ -94,10 +103,13 @@ export function saveSellerDeals(deals: SellerDeal[]) {
 }
 
 export function addSellerDeal(
-  deal: Omit<SellerDeal, "id" | "joined" | "orders">
+  deal: Omit<SellerDeal, "id" | "joined" | "orders" | "image"> & {
+    image?: string;
+  }
 ): SellerDeal {
   const newDeal: SellerDeal = {
     ...deal,
+    image: deal.image?.trim() ? deal.image.trim() : DEFAULT_DEAL_IMAGE,
     normalPrice: toFiniteNumber(deal.normalPrice),
     priceAt20: toFiniteNumber(deal.priceAt20),
     priceAt50: toFiniteNumber(deal.priceAt50),
