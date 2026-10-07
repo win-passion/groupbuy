@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AuthNav from "./components/AuthNav";
 
 const products = [
   {
@@ -80,9 +81,7 @@ export default function Home() {
 
           <span className="text-xl">🛒</span>
 
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 font-bold text-orange-600">
-            W
-          </div>
+          <AuthNav />
         </div>
       </nav>
 

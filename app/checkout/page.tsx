@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 const products = [
   {
@@ -23,7 +23,7 @@ const products = [
   },
 ];
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const searchParams = useSearchParams();
 
   const productId = Number(searchParams.get("product") || 0);
@@ -273,5 +273,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense>
+      <CheckoutContent />
+    </Suspense>
   );
 }
