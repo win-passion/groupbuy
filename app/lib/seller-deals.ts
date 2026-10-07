@@ -37,14 +37,34 @@ const seedDeals: SellerDeal[] = [
   },
 ];
 
+function toFiniteNumber(value: unknown, fallback = 0): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function normalizeDeal(raw: Partial<SellerDeal>, index: number): SellerDeal {
+  return {
+    id: typeof raw.id === "string" && raw.id ? raw.id : `deal-${index}`,
+    name: typeof raw.name === "string" ? raw.name : "Untitled deal",
+    description: typeof raw.description === "string" ? raw.description : "",
+    normalPrice: toFiniteNumber(raw.normalPrice),
+    priceAt20: toFiniteNumber(raw.priceAt20),
+    priceAt50: toFiniteNumber(raw.priceAt50),
+    endDate: typeof raw.endDate === "string" ? raw.endDate : "",
+    joined: toFiniteNumber(raw.joined),
+    orders: toFiniteNumber(raw.orders),
+  };
+}
+
 export function getCurrentPrice(deal: SellerDeal) {
-  if (deal.joined >= 50) {
-    return deal.priceAt50;
+  const joined = toFiniteNumber(deal.joined);
+  if (joined >= 50) {
+    return toFiniteNumber(deal.priceAt50, deal.normalPrice);
   }
-  if (deal.joined >= 20) {
-    return deal.priceAt20;
+  if (joined >= 20) {
+    return toFiniteNumber(deal.priceAt20, deal.normalPrice);
   }
-  return deal.normalPrice;
+  return toFiniteNumber(deal.normalPrice);
 }
 
 export function loadSellerDeals(): SellerDeal[] {
@@ -59,7 +79,11 @@ export function loadSellerDeals(): SellerDeal[] {
   }
 
   try {
-    return JSON.parse(raw) as SellerDeal[];
+    const parsed = JSON.parse(raw) as Partial<SellerDeal>[];
+    if (!Array.isArray(parsed)) {
+      return seedDeals;
+    }
+    return parsed.map(normalizeDeal);
   } catch {
     return seedDeals;
   }
@@ -74,6 +98,9 @@ export function addSellerDeal(
 ): SellerDeal {
   const newDeal: SellerDeal = {
     ...deal,
+    normalPrice: toFiniteNumber(deal.normalPrice),
+    priceAt20: toFiniteNumber(deal.priceAt20),
+    priceAt50: toFiniteNumber(deal.priceAt50),
     id: `deal-${Date.now()}`,
     joined: 0,
     orders: 0,

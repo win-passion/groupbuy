@@ -3,39 +3,55 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";
-import { notifySessionChange } from "../lib/user";
-
-const demoUser = {
-  name: "Demo User",
-  email: "demo@groupbuy.test",
-  password: "groupbuy123",
-};
+import { demoAccounts, notifySessionChange } from "../lib/user";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/";
-  const [email, setEmail] = useState(demoUser.email);
-  const [password, setPassword] = useState(demoUser.password);
+  const [email, setEmail] = useState(demoAccounts[0].email);
+  const [password, setPassword] = useState(demoAccounts[0].password);
   const [error, setError] = useState("");
+
+  function saveSession(name: string, userEmail: string, role: "buyer" | "seller") {
+    window.localStorage.setItem(
+      "groupbuy_user",
+      JSON.stringify({ name, email: userEmail, role })
+    );
+    notifySessionChange();
+    router.push(nextPath);
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const registeredUser = window.localStorage.getItem("groupbuy_registered_user");
-    const user = registeredUser ? JSON.parse(registeredUser) : demoUser;
-
-    if (email !== user.email || password !== user.password) {
-      setError("Those credentials do not match. Try the demo account below.");
+    const demoMatch = demoAccounts.find(
+      (account) => account.email === email && account.password === password
+    );
+    if (demoMatch) {
+      saveSession(demoMatch.name, demoMatch.email, demoMatch.role);
       return;
     }
 
-    window.localStorage.setItem(
-      "groupbuy_user",
-      JSON.stringify({ name: user.name, email: user.email, role: user.role ?? "buyer" })
-    );
-    notifySessionChange();
-    router.push(nextPath);
+    const registeredRaw = window.localStorage.getItem("groupbuy_registered_user");
+    if (registeredRaw) {
+      try {
+        const user = JSON.parse(registeredRaw) as {
+          name: string;
+          email: string;
+          password: string;
+          role?: "buyer" | "seller";
+        };
+        if (email === user.email && password === user.password) {
+          saveSession(user.name, user.email, user.role === "seller" ? "seller" : "buyer");
+          return;
+        }
+      } catch {
+        // ignore invalid stored registration
+      }
+    }
+
+    setError("Those credentials do not match. Try a demo account below.");
   }
 
   return (
@@ -83,7 +99,8 @@ function LoginForm() {
 
         <div className="mt-6 rounded-2xl bg-orange-50 p-4 text-sm">
           <p className="font-bold text-orange-700">Demo account</p>
-          <p className="mt-1 text-gray-600">demo@groupbuy.test</p>
+          <p className="mt-1 text-gray-600">buyer@groupbuy.test</p>
+          <p className="text-gray-600">seller@groupbuy.test</p>
           <p className="text-gray-600">groupbuy123</p>
         </div>
 

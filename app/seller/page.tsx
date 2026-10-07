@@ -14,8 +14,14 @@ function SellerDashboard() {
 
   const stats = useMemo(() => {
     const activeDeals = deals.filter(isDealActive).length;
-    const totalJoined = deals.reduce((sum, deal) => sum + deal.joined, 0);
-    const totalOrders = deals.reduce((sum, deal) => sum + deal.orders, 0);
+    const totalJoined = deals.reduce(
+      (sum, deal) => sum + (Number.isFinite(deal.joined) ? deal.joined : 0),
+      0
+    );
+    const totalOrders = deals.reduce(
+      (sum, deal) => sum + (Number.isFinite(deal.orders) ? deal.orders : 0),
+      0
+    );
 
     return { activeDeals, totalJoined, totalOrders };
   }, [deals]);

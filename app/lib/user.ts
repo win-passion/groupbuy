@@ -6,6 +6,25 @@ export type SessionUser = {
   role: UserRole;
 };
 
+export type DemoAccount = SessionUser & {
+  password: string;
+};
+
+export const demoAccounts: DemoAccount[] = [
+  {
+    name: "Buyer",
+    email: "buyer@groupbuy.test",
+    password: "groupbuy123",
+    role: "buyer",
+  },
+  {
+    name: "Seller",
+    email: "seller@groupbuy.test",
+    password: "groupbuy123",
+    role: "seller",
+  },
+];
+
 const SESSION_KEY = "groupbuy_user";
 
 let cachedRaw: string | null | undefined;
