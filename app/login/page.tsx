@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useState } from "react";
+import { notifySessionChange } from "../lib/user";
 
 const demoUser = {
   name: "Demo User",
@@ -10,8 +11,10 @@ const demoUser = {
   password: "groupbuy123",
 };
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next") || "/";
   const [email, setEmail] = useState(demoUser.email);
   const [password, setPassword] = useState(demoUser.password);
   const [error, setError] = useState("");
@@ -31,7 +34,8 @@ export default function LoginPage() {
       "groupbuy_user",
       JSON.stringify({ name: user.name, email: user.email, role: user.role ?? "buyer" })
     );
-    router.push("/");
+    notifySessionChange();
+    router.push(nextPath);
   }
 
   return (
@@ -91,5 +95,19 @@ export default function LoginPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-[#f8f8f8]">
+          <p className="text-sm text-gray-500">Loading...</p>
+        </main>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

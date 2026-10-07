@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { notifySessionChange } from "../lib/user";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -20,7 +21,8 @@ export default function RegisterPage() {
       "groupbuy_user",
       JSON.stringify({ name: user.name, email: user.email, role: user.role })
     );
-    router.push("/");
+    notifySessionChange();
+    router.push(role === "seller" ? "/seller" : "/");
   }
 
   return (

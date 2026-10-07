@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import RequireRole from "../components/RequireRole";
 
 const groups = [
   {
@@ -19,7 +22,7 @@ const groups = [
   },
 ];
 
-export default function MyGroupsPage() {
+function MyGroupsContent() {
   return (
     <main className="min-h-screen bg-[#f8f8f8] text-slate-900">
       <nav className="flex h-20 items-center border-b bg-white px-6 lg:px-10">
@@ -36,13 +39,9 @@ export default function MyGroupsPage() {
       </nav>
 
       <div className="mx-auto max-w-6xl px-5 py-10">
-        <p className="text-sm font-bold text-orange-500">
-          YOUR PURCHASES
-        </p>
+        <p className="text-sm font-bold text-orange-500">YOUR PURCHASES</p>
 
-        <h1 className="mt-1 text-4xl font-black">
-          My Groups
-        </h1>
+        <h1 className="mt-1 text-4xl font-black">My Groups</h1>
 
         <p className="mt-3 text-gray-500">
           Track the group deals you have joined.
@@ -56,25 +55,18 @@ export default function MyGroupsPage() {
 
           <div className="rounded-2xl bg-white p-6 shadow-sm">
             <p className="text-sm text-gray-500">Active Groups</p>
-            <p className="mt-2 text-3xl font-black text-orange-500">
-              2
-            </p>
+            <p className="mt-2 text-3xl font-black text-orange-500">2</p>
           </div>
 
           <div className="rounded-2xl bg-white p-6 shadow-sm">
             <p className="text-sm text-gray-500">Total Saved</p>
-            <p className="mt-2 text-3xl font-black text-green-600">
-              ฿350
-            </p>
+            <p className="mt-2 text-3xl font-black text-green-600">฿350</p>
           </div>
         </div>
 
         <div className="mt-8 space-y-5">
           {groups.map((group) => {
-            const progress = Math.min(
-              (group.joined / group.target) * 100,
-              100
-            );
+            const progress = Math.min((group.joined / group.target) * 100, 100);
 
             return (
               <div
@@ -82,7 +74,6 @@ export default function MyGroupsPage() {
                 className="rounded-[28px] bg-white p-6 shadow-sm"
               >
                 <div className="flex flex-col gap-6 md:flex-row md:items-center">
-
                   <div className="flex h-32 w-full items-center justify-center overflow-hidden rounded-2xl bg-white md:w-36">
                     <img
                       src={group.image}
@@ -96,9 +87,7 @@ export default function MyGroupsPage() {
                       ● Active
                     </span>
 
-                    <h2 className="mt-3 text-xl font-black">
-                      {group.name}
-                    </h2>
+                    <h2 className="mt-3 text-xl font-black">{group.name}</h2>
 
                     <p className="mt-1 text-sm text-gray-500">
                       Current Group Price
@@ -146,5 +135,13 @@ export default function MyGroupsPage() {
         </Link>
       </div>
     </main>
+  );
+}
+
+export default function MyGroupsPage() {
+  return (
+    <RequireRole role="buyer">
+      <MyGroupsContent />
+    </RequireRole>
   );
 }

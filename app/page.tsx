@@ -1,5 +1,7 @@
 import Link from "next/link";
 import AuthNav from "./components/AuthNav";
+import RoleNavLinks from "./components/RoleNavLinks";
+import SellerSidebarPromo from "./components/SellerSidebarPromo";
 
 const products = [
   {
@@ -71,13 +73,7 @@ export default function Home() {
             How it works
           </a>
 
-          <Link href="/my-groups" className="hidden hover:text-orange-500 md:block">
-            My Groups
-          </Link>
-
-          <Link href="/seller" className="hidden hover:text-orange-500 lg:block">
-            Sell on GroupBuy
-          </Link>
+          <RoleNavLinks />
 
           <span className="text-xl">🛒</span>
 
@@ -108,19 +104,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="mt-8 rounded-2xl bg-slate-900 p-5 text-white">
-            <p className="text-sm font-bold">Want to sell?</p>
-            <p className="mt-2 text-xs leading-5 text-slate-400">
-              Create group deals and sell more in one campaign.
-            </p>
-
-            <Link
-              href="/seller"
-              className="mt-4 block text-sm font-bold text-orange-400"
-            >
-              Seller Center →
-            </Link>
-          </div>
+          <SellerSidebarPromo />
         </aside>
 
         <div className="min-w-0 flex-1 p-5 lg:p-8">
