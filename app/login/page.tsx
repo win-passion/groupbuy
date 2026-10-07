@@ -29,7 +29,7 @@ export default function LoginPage() {
 
     window.localStorage.setItem(
       "groupbuy_user",
-      JSON.stringify({ name: user.name, email: user.email })
+      JSON.stringify({ name: user.name, email: user.email, role: user.role ?? "buyer" })
     );
     router.push("/");
   }

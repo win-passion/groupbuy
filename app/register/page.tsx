@@ -6,6 +6,7 @@ import { FormEvent, useState } from "react";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [role, setRole] = useState<"buyer" | "seller">("buyer");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,11 +14,11 @@ export default function RegisterPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const user = { name, email, password };
+    const user = { name, email, password, role };
     window.localStorage.setItem("groupbuy_registered_user", JSON.stringify(user));
     window.localStorage.setItem(
       "groupbuy_user",
-      JSON.stringify({ name: user.name, email: user.email })
+      JSON.stringify({ name: user.name, email: user.email, role: user.role })
     );
     router.push("/");
   }
@@ -30,9 +31,35 @@ export default function RegisterPage() {
         </Link>
 
         <h1 className="mt-10 text-3xl font-black">Create your account</h1>
-        <p className="mt-2 text-gray-500">Join groups and unlock better prices together.</p>
+        <p className="mt-2 text-gray-500">Join GroupBuy as a buyer or seller.</p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+          <fieldset>
+            <legend className="text-sm font-bold">Account type</legend>
+            <div className="mt-2 grid grid-cols-2 gap-2 rounded-2xl bg-gray-100 p-1.5">
+              {(["buyer", "seller"] as const).map((accountRole) => (
+                <label key={accountRole} className="cursor-pointer">
+                  <input
+                    type="radio"
+                    name="role"
+                    value={accountRole}
+                    checked={role === accountRole}
+                    onChange={() => setRole(accountRole)}
+                    className="peer sr-only"
+                  />
+                  <span className="block rounded-xl px-4 py-3 text-center text-sm font-bold text-gray-600 transition peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-orange-500">
+                    {accountRole === "buyer" ? "Buyer" : "Seller"}
+                  </span>
+                </label>
+              ))}
+            </div>
+            <p className="mt-2 text-sm text-gray-500">
+              {role === "buyer"
+                ? "Join group deals and unlock better prices."
+                : "Sell your products through group deals."}
+            </p>
+          </fieldset>
+
           <label className="block text-sm font-bold">
             Name
             <input
