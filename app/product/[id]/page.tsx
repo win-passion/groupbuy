@@ -8,7 +8,7 @@ const products = [
   {
     id: "0",
     name: "Wireless Earbuds Pro",
-    emoji: "🎧",
+    image: "/assets/earphone.jpeg",
     description:
       "Premium wireless earbuds with active noise cancellation and long-lasting battery.",
     normalPrice: 500,
@@ -19,7 +19,7 @@ const products = [
   {
     id: "1",
     name: "Smart Watch Series 5",
-    emoji: "⌚",
+    image: "/assets/watch.jpeg",
     description:
       "Smart watch for fitness tracking, notifications and everyday activities.",
     normalPrice: 1990,
@@ -30,7 +30,7 @@ const products = [
   {
     id: "2",
     name: "Coffee Maker",
-    emoji: "☕",
+    image: "/assets/Boncafe-Drip-Coffee-Maker-1.jpg",
     description:
       "Easy-to-use coffee maker for fresh coffee at home every morning.",
     normalPrice: 1290,
@@ -41,7 +41,7 @@ const products = [
   {
     id: "3",
     name: "Skincare Set",
-    emoji: "🧴",
+    image: "/assets/skincareset.jpeg",
     description:
       "Complete skincare set for a simple everyday skincare routine.",
     normalPrice: 990,
@@ -110,8 +110,12 @@ export default function ProductPage() {
         <div className="mt-6 grid gap-8 lg:grid-cols-2">
 
           {/* PRODUCT IMAGE */}
-          <div className="flex min-h-[520px] items-center justify-center rounded-[32px] bg-gradient-to-br from-white to-orange-50 text-[150px] shadow-sm">
-            {product.emoji}
+          <div className="flex min-h-[520px] items-center justify-center overflow-hidden rounded-[32px] bg-white shadow-sm">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="h-full max-h-[520px] w-full object-contain p-8"
+            />
           </div>
 
           {/* PRODUCT INFORMATION */}

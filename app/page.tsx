@@ -3,7 +3,7 @@ import Link from "next/link";
 const products = [
   {
     name: "Wireless Earbuds Pro",
-    emoji: "🎧",
+    image: "/assets/earphone.jpeg",
     price: "฿390",
     oldPrice: "฿500",
     joined: 42,
@@ -12,7 +12,7 @@ const products = [
   },
   {
     name: "Smart Watch Series 5",
-    emoji: "⌚",
+    image: "/assets/watch.jpeg",
     price: "฿1,490",
     oldPrice: "฿1,990",
     joined: 38,
@@ -21,7 +21,7 @@ const products = [
   },
   {
     name: "Coffee Maker",
-    emoji: "☕",
+    image: "/assets/Boncafe-Drip-Coffee-Maker-1.jpg",
     price: "฿890",
     oldPrice: "฿1,290",
     joined: 27,
@@ -30,7 +30,7 @@ const products = [
   },
   {
     name: "Skincare Set",
-    emoji: "🧴",
+    image: "/assets/skincareset.jpeg",
     price: "฿690",
     oldPrice: "฿990",
     joined: 34,
@@ -232,8 +232,12 @@ export default function Home() {
                     key={product.name}
                     className="group overflow-hidden rounded-3xl border border-gray-200 bg-white transition hover:-translate-y-1 hover:shadow-xl"
                   >
-                    <div className="relative flex h-52 items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 text-7xl">
-                      {product.emoji}
+                    <div className="relative flex h-52 items-center justify-center overflow-hidden bg-white">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="h-full w-full object-contain p-4"
+                      />
 
                       <span className="absolute left-4 top-4 rounded-full bg-orange-500 px-3 py-1 text-[11px] font-bold text-white">
                         {product.discount}

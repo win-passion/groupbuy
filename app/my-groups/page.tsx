@@ -4,7 +4,7 @@ const groups = [
   {
     id: 0,
     name: "Wireless Earbuds Pro",
-    emoji: "🎧",
+    image: "/assets/earphone.jpeg",
     price: 450,
     joined: 20,
     target: 50,
@@ -12,7 +12,7 @@ const groups = [
   {
     id: 1,
     name: "Smart Watch Series 5",
-    emoji: "⌚",
+    image: "/assets/watch.jpeg",
     price: 1690,
     joined: 20,
     target: 50,
@@ -83,8 +83,12 @@ export default function MyGroupsPage() {
               >
                 <div className="flex flex-col gap-6 md:flex-row md:items-center">
 
-                  <div className="flex h-32 w-full items-center justify-center rounded-2xl bg-orange-50 text-6xl md:w-36">
-                    {group.emoji}
+                  <div className="flex h-32 w-full items-center justify-center overflow-hidden rounded-2xl bg-white md:w-36">
+                    <img
+                      src={group.image}
+                      alt={group.name}
+                      className="h-full w-full object-contain p-3"
+                    />
                   </div>
 
                   <div className="flex-1">

@@ -39,8 +39,12 @@ export default function ProductPage() {
 
         <div className="mt-6 grid gap-8 lg:grid-cols-2">
           {/* IMAGE */}
-          <div className="flex min-h-[520px] items-center justify-center rounded-[32px] bg-gradient-to-br from-white to-orange-50 text-[150px] shadow-sm">
-            🎧
+          <div className="flex min-h-[520px] items-center justify-center overflow-hidden rounded-[32px] bg-white shadow-sm">
+            <img
+              src="/assets/earphone.jpeg"
+              alt="Wireless Earbuds Pro"
+              className="h-full max-h-[520px] w-full object-contain p-8"
+            />
           </div>
 
           {/* INFO */}

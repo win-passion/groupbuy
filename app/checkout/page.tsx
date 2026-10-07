@@ -7,19 +7,19 @@ import { useState } from "react";
 const products = [
   {
     name: "Wireless Earbuds Pro",
-    emoji: "🎧",
+    image: "/assets/earphone.jpeg",
   },
   {
     name: "Smart Watch Series 5",
-    emoji: "⌚",
+    image: "/assets/watch.jpeg",
   },
   {
     name: "Coffee Maker",
-    emoji: "☕",
+    image: "/assets/Boncafe-Drip-Coffee-Maker-1.jpg",
   },
   {
     name: "Skincare Set",
-    emoji: "🧴",
+    image: "/assets/skincareset.jpeg",
   },
 ];
 
@@ -47,8 +47,12 @@ export default function CheckoutPage() {
             You successfully joined the group purchase.
           </p>
 
-          <div className="mt-7 rounded-2xl bg-orange-50 p-5">
-            <div className="text-6xl">{product.emoji}</div>
+            <div className="mt-7 rounded-2xl bg-white p-5">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="mx-auto h-32 w-32 object-contain"
+            />
 
             <p className="mt-3 font-bold">
               {product.name}
@@ -185,8 +189,12 @@ export default function CheckoutPage() {
 
               <div className="mt-6 flex items-center gap-5 border-b pb-6">
 
-                <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-orange-50 text-5xl">
-                  {product.emoji}
+                <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl bg-white">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="h-full w-full object-contain p-2"
+                  />
                 </div>
 
                 <div>
