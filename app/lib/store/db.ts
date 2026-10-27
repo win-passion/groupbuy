@@ -6,7 +6,7 @@ import { Row, TableName, Tables } from "./types";
  */
 
 const PREFIX = "groupbuy_";
-const SCHEMA_VERSION = 9;
+const SCHEMA_VERSION = 10;
 const VERSION_KEY = `${PREFIX}schema_version`;
 /** Bumped on every write, so any tab can tell its cache is stale. */
 const REV_KEY = `${PREFIX}rev`;
