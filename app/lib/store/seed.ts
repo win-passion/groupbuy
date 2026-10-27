@@ -13,6 +13,9 @@ export type DemoAccount = { email: string; name: string; role: UserRole; note: s
 
 const SHOPPER_NAMES = ["Ploy", "Nat", "Mint", "Arm", "Beam", "Fah", "Ton", "Pim", "Kai", "Nok", "June"];
 
+/** Fifty additional synthetic buyers, kept separate from the original eleven. */
+const EXTRA_BUYER_NAMES = Array.from({ length: 50 }, (_, i) => `Demo Buyer ${String(i + 1).padStart(2, "0")}`);
+
 /**
  * Approved demo shops besides Win Gadgets (seller@), each owning the deals
  * in its category. Win Gadgets keeps electronics plus the deals that demo
@@ -77,6 +80,27 @@ const SHOPS: {
     deals: ["controller", "keyboard"],
     joinedDaysAgo: 30,
   },
+  // Twenty new approved sellers, each with their own product.
+  { email: "seller-extra01@groupbuy.test", owner: "Demo Seller 01", shopName: "Metro Audio", description: "Independent GroupBuy demo store offering portable bluetooth earbuds.", deals: ["newproduct01"], joinedDaysAgo: 21 },
+  { email: "seller-extra02@groupbuy.test", owner: "Demo Seller 02", shopName: "Pulse Wear", description: "Independent GroupBuy demo store offering fitness smartwatch.", deals: ["newproduct02"], joinedDaysAgo: 22 },
+  { email: "seller-extra03@groupbuy.test", owner: "Demo Seller 03", shopName: "Charge Hub", description: "Independent GroupBuy demo store offering compact power bank.", deals: ["newproduct03"], joinedDaysAgo: 23 },
+  { email: "seller-extra04@groupbuy.test", owner: "Demo Seller 04", shopName: "Sound Avenue", description: "Independent GroupBuy demo store offering mini bluetooth speaker.", deals: ["newproduct04"], joinedDaysAgo: 24 },
+  { email: "seller-extra05@groupbuy.test", owner: "Demo Seller 05", shopName: "Cozy Corner", description: "Independent GroupBuy demo store offering minimalist desk lamp.", deals: ["newproduct05"], joinedDaysAgo: 25 },
+  { email: "seller-extra06@groupbuy.test", owner: "Demo Seller 06", shopName: "Brew Daily", description: "Independent GroupBuy demo store offering home coffee brewer.", deals: ["newproduct06"], joinedDaysAgo: 26 },
+  { email: "seller-extra07@groupbuy.test", owner: "Demo Seller 07", shopName: "Quick Kitchen", description: "Independent GroupBuy demo store offering digital air fryer.", deals: ["newproduct07"], joinedDaysAgo: 27 },
+  { email: "seller-extra08@groupbuy.test", owner: "Demo Seller 08", shopName: "Smoothie Spot", description: "Independent GroupBuy demo store offering travel blender.", deals: ["newproduct08"], joinedDaysAgo: 28 },
+  { email: "seller-extra09@groupbuy.test", owner: "Demo Seller 09", shopName: "Pure Glow", description: "Independent GroupBuy demo store offering daily skincare kit.", deals: ["newproduct09"], joinedDaysAgo: 29 },
+  { email: "seller-extra10@groupbuy.test", owner: "Demo Seller 10", shopName: "Sun Shield", description: "Independent GroupBuy demo store offering spf50 sunscreen bundle.", deals: ["newproduct10"], joinedDaysAgo: 30 },
+  { email: "seller-extra11@groupbuy.test", owner: "Demo Seller 11", shopName: "Basic Studio", description: "Independent GroupBuy demo store offering essential cotton tees.", deals: ["newproduct11"], joinedDaysAgo: 31 },
+  { email: "seller-extra12@groupbuy.test", owner: "Demo Seller 12", shopName: "Carry Club", description: "Independent GroupBuy demo store offering commuter laptop backpack.", deals: ["newproduct12"], joinedDaysAgo: 32 },
+  { email: "seller-extra13@groupbuy.test", owner: "Demo Seller 13", shopName: "Rice Roots", description: "Independent GroupBuy demo store offering premium jasmine rice 5kg.", deals: ["newproduct13"], joinedDaysAgo: 33 },
+  { email: "seller-extra14@groupbuy.test", owner: "Demo Seller 14", shopName: "Bean District", description: "Independent GroupBuy demo store offering northern thai coffee beans.", deals: ["newproduct14"], joinedDaysAgo: 34 },
+  { email: "seller-extra15@groupbuy.test", owner: "Demo Seller 15", shopName: "Lift Lab", description: "Independent GroupBuy demo store offering home dumbbell set.", deals: ["newproduct15"], joinedDaysAgo: 35 },
+  { email: "seller-extra16@groupbuy.test", owner: "Demo Seller 16", shopName: "Hydro Trail", description: "Independent GroupBuy demo store offering steel insulated bottle.", deals: ["newproduct16"], joinedDaysAgo: 36 },
+  { email: "seller-extra17@groupbuy.test", owner: "Demo Seller 17", shopName: "Yoga Flow", description: "Independent GroupBuy demo store offering yoga starter kit.", deals: ["newproduct17"], joinedDaysAgo: 37 },
+  { email: "seller-extra18@groupbuy.test", owner: "Demo Seller 18", shopName: "Active Pulse", description: "Independent GroupBuy demo store offering fitness tracker band.", deals: ["newproduct18"], joinedDaysAgo: 38 },
+  { email: "seller-extra19@groupbuy.test", owner: "Demo Seller 19", shopName: "Game Orbit", description: "Independent GroupBuy demo store offering wireless gaming controller.", deals: ["newproduct19"], joinedDaysAgo: 39 },
+  { email: "seller-extra20@groupbuy.test", owner: "Demo Seller 20", shopName: "Key Craft", description: "Independent GroupBuy demo store offering mechanical gaming keyboard.", deals: ["newproduct20"], joinedDaysAgo: 40 },
 ];
 
 /** Shown on the login page and in the dev panel's account switcher. */
@@ -91,6 +115,12 @@ export const DEMO_ACCOUNTS: DemoAccount[] = [
     name,
     role: "buyer" as const,
     note: "Demo shopper",
+  })),
+  ...EXTRA_BUYER_NAMES.map((name, index) => ({
+    email: `buyer-extra${String(index + 1).padStart(2, "0")}@groupbuy.test`,
+    name,
+    role: "buyer" as const,
+    note: "Additional demo buyer",
   })),
 ];
 
@@ -493,6 +523,167 @@ const SEED_DEALS: SeedDeal[] = [
     ],
     shopperUnits: 0,
   },
+  // Twenty additional live products owned by the new sellers.
+  {
+    key: "newproduct01", title: "Portable Bluetooth Earbuds",
+    description: "Portable Bluetooth Earbuds offered by Metro Audio with lower prices when more buyers join the group.",
+    category: "electronics", image: "/assets/earphone.jpeg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 790], [10, 710], [25, 630]],
+    shopperUnits: 17,
+  },
+  {
+    key: "newproduct02", title: "Fitness Smartwatch",
+    description: "Fitness Smartwatch offered by Pulse Wear with lower prices when more buyers join the group.",
+    category: "electronics", image: "/assets/watch.jpeg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 1890], [10, 1700], [25, 1510]],
+    shopperUnits: 24,
+  },
+  {
+    key: "newproduct03", title: "Compact Power Bank",
+    description: "Compact Power Bank offered by Charge Hub with lower prices when more buyers join the group.",
+    category: "electronics", image: "/assets/products/power-bank.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 990], [10, 890], [25, 790]],
+    shopperUnits: 31,
+  },
+  {
+    key: "newproduct04", title: "Mini Bluetooth Speaker",
+    description: "Mini Bluetooth Speaker offered by Sound Avenue with lower prices when more buyers join the group.",
+    category: "electronics", image: "/assets/products/bluetooth-speaker.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 1290], [10, 1160], [25, 1030]],
+    shopperUnits: 38,
+  },
+  {
+    key: "newproduct05", title: "Minimalist Desk Lamp",
+    description: "Minimalist Desk Lamp offered by Cozy Corner with lower prices when more buyers join the group.",
+    category: "home-living", image: "/assets/products/desk-lamp.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 890], [10, 800], [25, 710]],
+    shopperUnits: 11,
+  },
+  {
+    key: "newproduct06", title: "Home Coffee Brewer",
+    description: "Home Coffee Brewer offered by Brew Daily with lower prices when more buyers join the group.",
+    category: "home-living", image: "/assets/Boncafe-Drip-Coffee-Maker-1.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 1590], [10, 1430], [25, 1270]],
+    shopperUnits: 18,
+  },
+  {
+    key: "newproduct07", title: "Digital Air Fryer",
+    description: "Digital Air Fryer offered by Quick Kitchen with lower prices when more buyers join the group.",
+    category: "home-living", image: "/assets/products/air-fryer.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 2790], [10, 2510], [25, 2230]],
+    shopperUnits: 25,
+  },
+  {
+    key: "newproduct08", title: "Travel Blender",
+    description: "Travel Blender offered by Smoothie Spot with lower prices when more buyers join the group.",
+    category: "home-living", image: "/assets/products/portable-blender.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 990], [10, 890], [25, 790]],
+    shopperUnits: 32,
+  },
+  {
+    key: "newproduct09", title: "Daily Skincare Kit",
+    description: "Daily Skincare Kit offered by Pure Glow with lower prices when more buyers join the group.",
+    category: "beauty", image: "/assets/skincareset.jpeg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 1190], [10, 1070], [25, 950]],
+    shopperUnits: 39,
+  },
+  {
+    key: "newproduct10", title: "SPF50 Sunscreen Bundle",
+    description: "SPF50 Sunscreen Bundle offered by Sun Shield with lower prices when more buyers join the group.",
+    category: "beauty", image: "/assets/products/sunscreen.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 690], [10, 620], [25, 550]],
+    shopperUnits: 12,
+  },
+  {
+    key: "newproduct11", title: "Essential Cotton Tees",
+    description: "Essential Cotton Tees offered by Basic Studio with lower prices when more buyers join the group.",
+    category: "fashion", image: "/assets/products/tshirt-pack.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 890], [10, 800], [25, 710]],
+    shopperUnits: 19,
+  },
+  {
+    key: "newproduct12", title: "Commuter Laptop Backpack",
+    description: "Commuter Laptop Backpack offered by Carry Club with lower prices when more buyers join the group.",
+    category: "fashion", image: "/assets/products/backpack.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 1490], [10, 1340], [25, 1190]],
+    shopperUnits: 26,
+  },
+  {
+    key: "newproduct13", title: "Premium Jasmine Rice 5kg",
+    description: "Premium Jasmine Rice 5kg offered by Rice Roots with lower prices when more buyers join the group.",
+    category: "food", image: "/assets/products/jasmine-rice.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 390], [10, 350], [25, 310]],
+    shopperUnits: 33,
+  },
+  {
+    key: "newproduct14", title: "Northern Thai Coffee Beans",
+    description: "Northern Thai Coffee Beans offered by Bean District with lower prices when more buyers join the group.",
+    category: "food", image: "/assets/products/coffee-beans.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 790], [10, 710], [25, 630]],
+    shopperUnits: 40,
+  },
+  {
+    key: "newproduct15", title: "Home Dumbbell Set",
+    description: "Home Dumbbell Set offered by Lift Lab with lower prices when more buyers join the group.",
+    category: "sports", image: "/assets/products/dumbbells.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 3290], [10, 2960], [25, 2630]],
+    shopperUnits: 13,
+  },
+  {
+    key: "newproduct16", title: "Steel Insulated Bottle",
+    description: "Steel Insulated Bottle offered by Hydro Trail with lower prices when more buyers join the group.",
+    category: "sports", image: "/assets/products/water-bottle.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 590], [10, 530], [25, 470]],
+    shopperUnits: 20,
+  },
+  {
+    key: "newproduct17", title: "Yoga Starter Kit",
+    description: "Yoga Starter Kit offered by Yoga Flow with lower prices when more buyers join the group.",
+    category: "sports", image: "/assets/products/yoga-mat.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 890], [10, 800], [25, 710]],
+    shopperUnits: 27,
+  },
+  {
+    key: "newproduct18", title: "Fitness Tracker Band",
+    description: "Fitness Tracker Band offered by Active Pulse with lower prices when more buyers join the group.",
+    category: "sports", image: "/assets/products/fitness-band.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 1390], [10, 1250], [25, 1110]],
+    shopperUnits: 34,
+  },
+  {
+    key: "newproduct19", title: "Wireless Gaming Controller",
+    description: "Wireless Gaming Controller offered by Game Orbit with lower prices when more buyers join the group.",
+    category: "gaming", image: "/assets/products/game-controller.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 1790], [10, 1610], [25, 1430]],
+    shopperUnits: 41,
+  },
+  {
+    key: "newproduct20", title: "Mechanical Gaming Keyboard",
+    description: "Mechanical Gaming Keyboard offered by Key Craft with lower prices when more buyers join the group.",
+    category: "gaming", image: "/assets/products/mechanical-keyboard.jpg", status: "live",
+    startsInHours: -24, endsInHours: 120, votingDays: 7, maxUnitsPerBuyer: 3,
+    tiers: [[1, 2690], [10, 2420], [25, 2150]],
+    shopperUnits: 14,
+  },
 ];
 
 /** The demo buyer's own votes, so My Groups has something to show. */
@@ -580,7 +771,7 @@ export function buildSeed(): Tables {
   const defaultSellerId = accountId("seller@groupbuy.test");
   const sellerByDeal = new Map(SHOPS.flatMap((shop) => shop.deals.map((key) => [key, accountId(shop.email)] as const)));
   const buyerId = accountId("buyer@groupbuy.test");
-  const shopperIds = DEMO_ACCOUNTS.filter((account) => account.note === "Demo shopper").map(
+  const shopperIds = DEMO_ACCOUNTS.filter((account) => (account.note === "Demo shopper" || account.note === "Additional demo buyer")).map(
     (account) => accountId(account.email)
   );
 
