@@ -1,68 +1,44 @@
 "use client";
 
 import Link from "next/link";
+import AuthFrame from "../components/AuthFrame";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";
-import { demoAccounts, notifySessionChange } from "../lib/user";
+import Icon from "../components/shell/Icon";
+import { DEMO_ACCOUNTS, DEMO_PASSWORD, login, ROLE_LABELS } from "../lib/store";
+
+const ROLE_ICONS = { buyer: "user", seller: "store", admin: "shield" } as const;
+
+// The main demo roles; extra shops and shoppers are in the dev panel's account switcher.
+const LOGIN_DEMOS = DEMO_ACCOUNTS.filter((account) => account.note !== "Demo shopper" && !account.note.startsWith("Demo shop:"));
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/";
-  const [email, setEmail] = useState(demoAccounts[0].email);
-  const [password, setPassword] = useState(demoAccounts[0].password);
+  const [email, setEmail] = useState(LOGIN_DEMOS[0].email);
+  const [password, setPassword] = useState(DEMO_PASSWORD);
   const [error, setError] = useState("");
-
-  function saveSession(name: string, userEmail: string, role: "buyer" | "seller") {
-    window.localStorage.setItem(
-      "groupbuy_user",
-      JSON.stringify({ name, email: userEmail, role })
-    );
-    notifySessionChange();
-    router.push(nextPath);
-  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const demoMatch = demoAccounts.find(
-      (account) => account.email === email && account.password === password
-    );
-    if (demoMatch) {
-      saveSession(demoMatch.name, demoMatch.email, demoMatch.role);
+    const result = login(email, password);
+    if (!result.ok) {
+      setError(result.error);
       return;
     }
+    router.push(nextPath);
+  }
 
-    const registeredRaw = window.localStorage.getItem("groupbuy_registered_user");
-    if (registeredRaw) {
-      try {
-        const user = JSON.parse(registeredRaw) as {
-          name: string;
-          email: string;
-          password: string;
-          role?: "buyer" | "seller";
-        };
-        if (email === user.email && password === user.password) {
-          saveSession(user.name, user.email, user.role === "seller" ? "seller" : "buyer");
-          return;
-        }
-      } catch {
-        // ignore invalid stored registration
-      }
-    }
-
-    setError("Those credentials do not match. Try a demo account below.");
+  function fillDemo(demoEmail: string) {
+    setEmail(demoEmail);
+    setPassword(DEMO_PASSWORD);
+    setError("");
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f8f8f8] px-5 py-10 text-slate-900">
-      <div className="w-full max-w-md rounded-[28px] bg-white p-8 shadow-sm sm:p-10">
-        <Link href="/" className="text-2xl font-black tracking-tight">
-          <span className="text-orange-500">Group</span>Buy
-        </Link>
-
-        <h1 className="mt-10 text-3xl font-black">Welcome back</h1>
-        <p className="mt-2 text-gray-500">Log in to keep browsing your group deals.</p>
+    <AuthFrame title="Welcome back" subtitle="Log in to keep browsing your group deals.">
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <label className="block text-sm font-bold">
@@ -71,7 +47,7 @@ function LoginForm() {
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-orange-500"
+              className="mt-2 w-full rounded-xl border border-line bg-surface px-4 py-3 font-normal outline-none transition focus:border-brand-500"
               required
             />
           </label>
@@ -82,36 +58,63 @@ function LoginForm() {
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-orange-500"
+              className="mt-2 w-full rounded-xl border border-line bg-surface px-4 py-3 font-normal outline-none transition focus:border-brand-500"
               required
             />
           </label>
 
-          {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+          {error && <p className="text-sm font-semibold text-danger">{error}</p>}
 
           <button
             type="submit"
-            className="w-full rounded-xl bg-orange-500 py-3 font-bold text-white transition hover:bg-orange-600"
+            className="w-full rounded-xl bg-brand-500 py-3.5 font-bold text-white shadow-md shadow-brand-200 transition hover:bg-brand-600"
           >
             Log in
           </button>
         </form>
 
-        <div className="mt-6 rounded-2xl bg-orange-50 p-4 text-sm">
-          <p className="font-bold text-orange-700">Demo account</p>
-          <p className="mt-1 text-gray-600">buyer@groupbuy.test</p>
-          <p className="text-gray-600">seller@groupbuy.test</p>
-          <p className="text-gray-600">groupbuy123</p>
+        <div className="mt-6 rounded-2xl bg-brand-50 p-4 text-sm">
+          <p className="inline-flex items-center gap-1.5 font-bold text-brand-700">
+            <Icon name="sparkles" className="h-4 w-4" />
+            Demo accounts
+          </p>
+          <p className="mt-1 text-muted-strong">
+            Password for all: <span className="font-bold">{DEMO_PASSWORD}</span>
+          </p>
+          <div className="mt-3 grid gap-2">
+            {LOGIN_DEMOS.map((account) => (
+              <button
+                key={account.email}
+                type="button"
+                onClick={() => fillDemo(account.email)}
+                className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-left transition ${
+                  email === account.email
+                    ? "border-brand-400 bg-surface"
+                    : "border-transparent hover:bg-surface"
+                }`}
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-surface text-brand-500 shadow-sm">
+                  <Icon name={ROLE_ICONS[account.role]} className="h-4 w-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-semibold">{account.email}</span>
+                  <span className="block text-xs text-muted">{account.note}</span>
+                </span>
+                <span className="shrink-0 rounded-full bg-surface-muted px-2 py-0.5 text-xs font-bold text-muted-strong">
+                  {ROLE_LABELS[account.role]}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <p className="mt-7 text-center text-sm text-gray-500">
+        <p className="mt-7 text-center text-sm text-muted">
           New to GroupBuy?{" "}
-          <Link href="/register" className="font-bold text-orange-500 hover:text-orange-600">
+          <Link href="/register" className="font-bold text-brand-500 hover:text-brand-600">
             Create an account
           </Link>
         </p>
-      </div>
-    </main>
+    </AuthFrame>
   );
 }
 
@@ -119,8 +122,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <main className="flex min-h-screen items-center justify-center bg-[#f8f8f8]">
-          <p className="text-sm text-gray-500">Loading...</p>
+        <main className="flex min-h-screen items-center justify-center bg-canvas">
+          <p className="text-sm text-muted">Loading...</p>
         </main>
       }
     >

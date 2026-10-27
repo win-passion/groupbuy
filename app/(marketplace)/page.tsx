@@ -1,296 +1,138 @@
 import Link from "next/link";
-import AuthNav from "./components/AuthNav";
-import RoleNavLinks from "./components/RoleNavLinks";
-import SellerSidebarPromo from "./components/SellerSidebarPromo";
+import Icon from "../components/shell/Icon";
+import { CategoryNav, DealGrid } from "./DealBrowser";
+import DealSearch from "./DealSearch";
 
-const products = [
-  {
-    name: "Wireless Earbuds Pro",
-    image: "/assets/earphone.jpeg",
-    price: "฿390",
-    oldPrice: "฿500",
-    joined: 42,
-    target: 50,
-    discount: "SAVE 22%",
-  },
-  {
-    name: "Smart Watch Series 5",
-    image: "/assets/watch.jpeg",
-    price: "฿1,490",
-    oldPrice: "฿1,990",
-    joined: 38,
-    target: 50,
-    discount: "SAVE 25%",
-  },
-  {
-    name: "Coffee Maker",
-    image: "/assets/Boncafe-Drip-Coffee-Maker-1.jpg",
-    price: "฿890",
-    oldPrice: "฿1,290",
-    joined: 27,
-    target: 40,
-    discount: "SAVE 31%",
-  },
-  {
-    name: "Skincare Set",
-    image: "/assets/skincareset.jpeg",
-    price: "฿690",
-    oldPrice: "฿990",
-    joined: 34,
-    target: 50,
-    discount: "SAVE 30%",
-  },
-];
-
-const categories = [
-  ["📱", "Electronics"],
-  ["🏠", "Home & Living"],
-  ["💄", "Beauty"],
-  ["👕", "Fashion"],
-  ["🍔", "Food"],
-  ["⚽", "Sports"],
-  ["🎮", "Gaming"],
-];
-
-export default function Home() {
+/** Decorative card showing a price dropping through tiers, for the hero. */
+function HeroIllustration() {
+  const tiers = [
+    { units: "1+", price: "฿500", reached: true },
+    { units: "20+", price: "฿450", reached: true },
+    { units: "50+", price: "฿390", reached: false },
+  ];
   return (
-    <main className="min-h-screen bg-[#f8f8f8] text-slate-900">
-      {/* NAVBAR */}
-      <nav className="sticky top-0 z-50 flex h-20 items-center border-b bg-white/95 px-6 backdrop-blur lg:px-10">
-        <Link href="/" className="text-2xl font-black tracking-tight">
-          <span className="text-orange-500">Group</span>Buy
-        </Link>
-
-        <div className="mx-10 hidden max-w-xl flex-1 md:block">
-          <input
-            placeholder="Search products, brands and group deals..."
-            className="w-full rounded-full border border-gray-200 bg-gray-50 px-6 py-3 text-sm outline-none focus:border-orange-400"
-          />
+    <div aria-hidden="true" className="relative hidden w-80 shrink-0 xl:block">
+      <div className="absolute -right-6 -top-6 h-40 w-40 rounded-full bg-brand-300/30 blur-2xl" />
+      <div className="relative rotate-2 rounded-3xl bg-surface p-5 shadow-xl motion-safe:animate-rise">
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-50 text-brand-500">
+            <Icon name="headphones" className="h-6 w-6" />
+          </span>
+          <div>
+            <p className="text-sm font-bold">Wireless Earbuds Pro</p>
+            <p className="text-xs text-muted">42 units voted</p>
+          </div>
         </div>
-
-        <div className="ml-auto flex items-center gap-6 text-sm font-semibold">
-          <a href="#how" className="hidden hover:text-orange-500 md:block">
-            How it works
-          </a>
-
-          <RoleNavLinks />
-
-          <span className="text-xl">🛒</span>
-
-          <AuthNav />
+        <div className="mt-4 h-2.5 rounded-full bg-surface-muted">
+          <div className="h-2.5 w-[84%] rounded-full bg-gradient-to-r from-brand-400 to-brand-600" />
         </div>
-      </nav>
-
-      <div className="mx-auto flex max-w-[1500px]">
-        {/* SIDEBAR */}
-        <aside className="hidden w-60 shrink-0 p-6 lg:block">
-          <p className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400">
-            Categories
-          </p>
-
-          <div className="space-y-1">
-            {categories.map(([icon, name], index) => (
-              <div
-                key={name}
-                className={`flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium ${
-                  index === 0
-                    ? "bg-orange-50 text-orange-600"
-                    : "hover:bg-white"
-                }`}
-              >
-                <span>{icon}</span>
-                {name}
-              </div>
+        <div className="mt-4 space-y-2">
+          {tiers.map((tier) => (
+            <div
+              key={tier.units}
+              className={`flex items-center justify-between rounded-xl px-3 py-2 text-sm ${
+                tier.reached ? "bg-brand-50 font-bold text-brand-700" : "border border-dashed border-line text-muted"
+              }`}
+            >
+              <span className="inline-flex items-center gap-2">
+                <Icon name={tier.reached ? "done" : "lock"} className="h-4 w-4" />
+                {tier.units} units
+              </span>
+              <span>{tier.price}</span>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-ink px-3 py-1.5 text-xs font-bold text-white">
+          <Icon name="zap" className="h-3.5 w-3.5 text-brand-300" />8 more to unlock ฿390
+        </p>
+      </div>
+      <div className="absolute -bottom-6 -left-8 -rotate-3 rounded-2xl bg-surface px-4 py-3 shadow-lg motion-safe:animate-float">
+        <p className="flex items-center gap-2 text-sm font-bold">
+          <span className="flex -space-x-2">
+            {["bg-brand-200", "bg-brand-300", "bg-brand-400"].map((color) => (
+              <span key={color} className={`h-6 w-6 rounded-full border-2 border-surface ${color}`} />
             ))}
+          </span>
+          Everyone gets the lower price
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default async function Home({ searchParams }: PageProps<"/">) {
+  const params = await searchParams;
+  const q = typeof params.q === "string" ? params.q : "";
+  const category = typeof params.category === "string" ? params.category : null;
+
+  return (
+    <div className="mx-auto max-w-[1500px] p-4 sm:p-5 lg:p-8">
+      {/* HERO (full width) */}
+      <section className="relative overflow-hidden rounded-hero bg-gradient-to-br from-hero-from via-hero-via to-hero-to px-6 py-10 sm:px-10 sm:py-14 lg:px-14 lg:py-16">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 opacity-40 [background-image:radial-gradient(var(--color-brand-200)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:linear-gradient(to_left,black,transparent_70%)]"
+        />
+        <div className="relative z-10 flex items-center justify-between gap-10">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full bg-surface/90 px-3.5 py-1.5 text-xs font-bold text-brand-600 shadow-sm">
+              <Icon name="flame" className="h-4 w-4" />
+              Save more together
+            </div>
+
+            <h1 className="mt-6 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+              Buy together.
+              <br />
+              <span className="bg-gradient-to-r from-brand-500 to-brand-600 bg-clip-text text-transparent">Pay less.</span>
+            </h1>
+
+            <p className="mt-5 max-w-xl text-base leading-7 text-ink-muted sm:text-lg sm:leading-8">
+              Vote for the deals you want. The more units everyone votes, the lower the price, and you only pay once
+              it&apos;s final.
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href="#deals"
+                className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-6 py-3.5 font-bold text-white shadow-lg shadow-brand-200 transition hover:bg-brand-600"
+              >
+                Explore deals
+                <Icon name="arrow-right" className="h-5 w-5" />
+              </a>
+
+              <Link
+                href="/how-it-works"
+                className="inline-flex items-center gap-2 rounded-xl bg-surface/80 px-6 py-3.5 font-bold text-ink shadow-sm ring-1 ring-brand-200 transition hover:bg-surface"
+              >
+                How it works
+              </Link>
+            </div>
           </div>
 
-          <SellerSidebarPromo />
+          <HeroIllustration />
+        </div>
+      </section>
+
+      {/* CATEGORIES + DEALS */}
+      <div id="deals" className="mt-10 scroll-mt-24 lg:flex lg:gap-8">
+        <aside className="hidden w-60 shrink-0 lg:block">
+          <div className="sticky top-24">
+            {/* Same height as the search bar, so the two line up */}
+            <p className="mb-4 flex h-12 items-center px-3 text-xs font-bold uppercase tracking-wider text-subtle">Categories</p>
+            <CategoryNav active={category} q={q} variant="sidebar" />
+          </div>
         </aside>
 
-        <div className="min-w-0 flex-1 p-5 lg:p-8">
-          {/* HERO */}
-          <section className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#fff3e9] via-[#fff8f2] to-[#ffe6d1] px-8 py-14 lg:px-16 lg:py-16">
-            <div className="relative z-10 max-w-2xl">
-              <div className="inline-flex rounded-full bg-white px-4 py-2 text-xs font-bold text-orange-600 shadow-sm">
-                🔥 SAVE MORE TOGETHER
-              </div>
-
-              <h1 className="mt-6 text-5xl font-black leading-[1.05] tracking-tight lg:text-7xl">
-                Buy together.
-                <br />
-                <span className="text-orange-500">Pay less.</span>
-              </h1>
-
-              <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-                Join other shoppers, grow the group and unlock lower prices
-                together.
-              </p>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a
-                  href="#deals"
-                  className="rounded-xl bg-orange-500 px-7 py-4 font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-orange-600"
-                >
-                  Explore Deals →
-                </a>
-
-                <a
-                  href="#how"
-                  className="rounded-xl border border-orange-200 bg-white px-7 py-4 font-bold"
-                >
-                  How It Works
-                </a>
-              </div>
-
-              <div className="mt-9 flex gap-8 text-sm">
-                <div>
-                  <p className="text-xl font-black">12K+</p>
-                  <p className="text-gray-500">Members</p>
-                </div>
-
-                <div>
-                  <p className="text-xl font-black">350+</p>
-                  <p className="text-gray-500">Group Deals</p>
-                </div>
-
-                <div>
-                  <p className="text-xl font-black">30%</p>
-                  <p className="text-gray-500">Avg. Saving</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute -bottom-24 -right-16 hidden h-96 w-96 rounded-full bg-orange-300/30 lg:block" />
-            <div className="absolute right-20 top-16 hidden text-[150px] lg:block">
-              🛍️
-            </div>
-          </section>
-
-          {/* HOW */}
-          <section id="how" className="mt-8 rounded-3xl border bg-white p-7">
-            <div className="grid gap-6 md:grid-cols-4">
-              {[
-                ["01", "Find a Deal", "Choose a product you want."],
-                ["02", "Join the Group", "Join buyers who want the same item."],
-                ["03", "Unlock Price", "More buyers unlock better prices."],
-                ["04", "Pay & Receive", "Checkout and wait for delivery."],
-              ].map(([number, title, text]) => (
-                <div key={number} className="flex gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-50 font-black text-orange-500">
-                    {number}
-                  </div>
-
-                  <div>
-                    <p className="font-bold">{title}</p>
-                    <p className="mt-1 text-sm leading-5 text-gray-500">
-                      {text}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* DEALS */}
-          <section id="deals" className="mt-12">
-            <div className="mb-6 flex items-end justify-between">
-              <div>
-                <p className="text-sm font-bold text-orange-500">
-                  TRENDING NOW
-                </p>
-                <h2 className="mt-1 text-3xl font-black">Hot Group Deals 🔥</h2>
-              </div>
-
-              <span className="hidden text-sm font-bold text-orange-500 sm:block">
-                View all →
-              </span>
-            </div>
-
-            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-              {products.map((product, index) => {
-                const progress = (product.joined / product.target) * 100;
-
-                return (
-                  <div
-                    key={product.name}
-                    className="group overflow-hidden rounded-3xl border border-gray-200 bg-white transition hover:-translate-y-1 hover:shadow-xl"
-                  >
-                    <div className="relative flex h-52 items-center justify-center overflow-hidden bg-white">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="h-full w-full object-contain p-4"
-                      />
-
-                      <span className="absolute left-4 top-4 rounded-full bg-orange-500 px-3 py-1 text-[11px] font-bold text-white">
-                        {product.discount}
-                      </span>
-                    </div>
-
-                    <div className="p-5">
-                      <p className="text-xs font-semibold text-gray-400">
-                        Group Deal
-                      </p>
-
-                      <h3 className="mt-1 font-bold">{product.name}</h3>
-
-                      <div className="mt-3 flex items-end gap-2">
-                        <span className="text-2xl font-black text-orange-500">
-                          {product.price}
-                        </span>
-
-                        <span className="pb-1 text-sm text-gray-400 line-through">
-                          {product.oldPrice}
-                        </span>
-                      </div>
-
-                      <div className="mt-5 h-2 overflow-hidden rounded-full bg-gray-100">
-                        <div
-                          className="h-full rounded-full bg-orange-500"
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-
-                      <div className="mt-2 flex justify-between text-xs text-gray-500">
-                        <span>
-                          👥 {product.joined}/{product.target} joined
-                        </span>
-                        <span>2d left</span>
-                      </div>
-
-                      <Link
-                        href={index === 0 ? "/product" : "/product"}
-                        className="mt-5 block w-full rounded-xl bg-slate-900 py-3 text-center text-sm font-bold text-white transition group-hover:bg-orange-500"
-                      >
-                        View Group Deal →
-                      </Link>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
-          {/* WHY */}
-          <section className="mt-14 grid gap-5 md:grid-cols-3">
-            {[
-              ["💸", "Lower Prices", "Prices fall as more people join."],
-              ["🤝", "Buy Together", "Invite friends or join existing groups."],
-              ["🔒", "Clear & Simple", "See targets, prices and progress before joining."],
-            ].map(([icon, title, text]) => (
-              <div key={title} className="rounded-3xl bg-white p-7">
-                <div className="text-3xl">{icon}</div>
-                <h3 className="mt-4 text-lg font-bold">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-gray-500">{text}</p>
-              </div>
-            ))}
-          </section>
-
-          <footer className="mt-14 border-t py-8 text-center text-sm text-gray-400">
-            GroupBuy Prototype • Buy Together, Pay Less.
-          </footer>
-        </div>
+        <section className="min-w-0 flex-1">
+          <div className="mb-4">
+            <DealSearch query={q} category={category} />
+          </div>
+          <div className="mb-6 lg:hidden">
+            <CategoryNav active={category} q={q} variant="chips" />
+          </div>
+          <DealGrid q={q} category={category} />
+        </section>
       </div>
-    </main>
+    </div>
   );
 }

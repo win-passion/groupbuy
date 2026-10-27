@@ -1,160 +1,47 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
-import RequireRole from "../../components/RequireRole";
-import { addSellerDeal, DEFAULT_DEAL_IMAGE } from "../../lib/seller-deals";
+import { BackLink, EmptyState, PageHeader } from "../../components/ui";
+import { getSetting, useDb } from "../../lib/store";
+import DealEditor from "../DealEditor";
+import { useCanSell } from "../SellerStatusBanner";
 
-function CreateDealForm() {
-  const router = useRouter();
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [normalPrice, setNormalPrice] = useState("");
-  const [priceAt20, setPriceAt20] = useState("");
-  const [priceAt50, setPriceAt50] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [image, setImage] = useState("");
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    addSellerDeal({
-      name,
-      description,
-      image: image.trim() || undefined,
-      normalPrice: Number(normalPrice),
-      priceAt20: Number(priceAt20),
-      priceAt50: Number(priceAt50),
-      endDate,
-    });
-
-    router.push("/seller");
-  }
+export default function CreateDealPage() {
+  const db = useDb();
+  const canSell = useCanSell();
 
   return (
-    <main className="min-h-screen bg-[#f8f8f8] text-slate-900">
-      <nav className="flex h-20 items-center border-b bg-white px-6 lg:px-10">
-        <Link href="/" className="text-2xl font-black">
-          <span className="text-orange-500">Group</span>Buy
-        </Link>
-        <Link
-          href="/seller"
-          className="ml-auto text-sm font-bold hover:text-orange-500"
-        >
-          ← Back to dashboard
-        </Link>
-      </nav>
-
-      <div className="mx-auto max-w-2xl px-5 py-10">
-        <p className="text-sm font-bold text-orange-500">NEW CAMPAIGN</p>
-        <h1 className="mt-1 text-4xl font-black">Create Group Deal</h1>
-        <p className="mt-3 text-gray-500">
-          Set tier prices at 20 and 50 buyers. Your deal appears on the dashboard
-          right after you create it.
-        </p>
-
-        <form
-          onSubmit={handleSubmit}
-          className="mt-8 space-y-5 rounded-[28px] bg-white p-7 shadow-sm"
-        >
-          <label className="block text-sm font-bold">
-            Product Name
-            <input
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-orange-500"
-              required
-            />
-          </label>
-
-          <label className="block text-sm font-bold">
-            Product Image URL
-            <input
-              value={image}
-              onChange={(event) => setImage(event.target.value)}
-              placeholder={DEFAULT_DEAL_IMAGE}
-              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-orange-500"
-            />
-            <span className="mt-1 block text-xs font-normal text-gray-500">
-              Optional. Use a path like {DEFAULT_DEAL_IMAGE}
-            </span>
-          </label>
-
-          <label className="block text-sm font-bold">
-            Description
-            <textarea
-              value={description}
-              onChange={(event) => setDescription(event.target.value)}
-              rows={3}
-              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-orange-500"
-              required
-            />
-          </label>
-
-          <div className="grid gap-4 sm:grid-cols-3">
-            <label className="block text-sm font-bold">
-              Normal Price (฿)
-              <input
-                type="number"
-                min={1}
-                value={normalPrice}
-                onChange={(event) => setNormalPrice(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-orange-500"
-                required
-              />
-            </label>
-            <label className="block text-sm font-bold">
-              Price at 20 buyers (฿)
-              <input
-                type="number"
-                min={1}
-                value={priceAt20}
-                onChange={(event) => setPriceAt20(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-orange-500"
-                required
-              />
-            </label>
-            <label className="block text-sm font-bold">
-              Price at 50 buyers (฿)
-              <input
-                type="number"
-                min={1}
-                value={priceAt50}
-                onChange={(event) => setPriceAt50(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-orange-500"
-                required
-              />
-            </label>
-          </div>
-
-          <label className="block text-sm font-bold">
-            End Date
-            <input
-              type="date"
-              value={endDate}
-              onChange={(event) => setEndDate(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-orange-500"
-              required
-            />
-          </label>
-
-          <button
-            type="submit"
-            className="w-full rounded-xl bg-orange-500 py-3 font-bold text-white transition hover:bg-orange-600"
-          >
-            Create Group Deal
-          </button>
-        </form>
+    <div className="mx-auto max-w-6xl px-5 py-8 lg:py-10">
+      <BackLink href={"/seller"}>Back to dashboard</BackLink>
+      <div className="mt-4">
+        <PageHeader
+          eyebrow="NEW CAMPAIGN"
+          title="Create Group Deal"
+          text="Set your price tiers and voting period. An admin reviews every deal before it goes live."
+        />
       </div>
-    </main>
-  );
-}
-
-export default function CreateSellerDealPage() {
-  return (
-    <RequireRole role="seller">
-      <CreateDealForm />
-    </RequireRole>
+      <div className="mt-8">
+        {db && !canSell && (
+          <EmptyState
+            icon="hourglass"
+            title="Not approved yet"
+            text="You can create deals once an admin approves your seller application."
+            action={{ href: "/seller", label: "Back to dashboard" }}
+          />
+        )}
+        {db && canSell && (
+          <DealEditor
+            initial={{
+              title: "",
+              description: "",
+              categoryId: "",
+              imageSrc: "",
+              tiers: [{ minUnits: 1, unitPrice: 0 }],
+              votingDays: getSetting(db, "votingPeriodDefaultDays"),
+              maxUnitsPerBuyer: null,
+            }}
+          />
+        )}
+      </div>
+    </div>
   );
 }

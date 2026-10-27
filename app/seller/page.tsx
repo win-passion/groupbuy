@@ -2,160 +2,191 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import RequireRole from "../components/RequireRole";
-import {
-  getCurrentPrice,
-  isDealActive,
-  loadSellerDeals,
-} from "../lib/seller-deals";
+import Countdown from "../components/deals/Countdown";
+import DealStatusPill from "../components/deals/DealStatusPill";
+import TierProgress from "../components/deals/TierProgress";
+import Icon from "../components/shell/Icon";
+import { EmptyState, PageHeader, Skeleton, StatCard } from "../components/ui";
+import { dealSummary, DealSummary, formatTHB, useDb, useSessionUser } from "../lib/store";
+import { useCanSell } from "./SellerStatusBanner";
 
-function SellerDashboard() {
-  const [deals] = useState(() => loadSellerDeals());
+const TABS = [
+  { id: "decide", label: "Decide now", statuses: ["seller_decision"] },
+  { id: "live", label: "Live", statuses: ["live"] },
+  { id: "payments", label: "Payments & shipping", statuses: ["payment_window", "fulfilling"] },
+  { id: "review", label: "In review", statuses: ["pending_review"] },
+  { id: "drafts", label: "Drafts", statuses: ["draft", "rejected"] },
+  { id: "ended", label: "Ended", statuses: ["completed", "cancelled"] },
+] as const;
 
-  const stats = useMemo(() => {
-    const activeDeals = deals.filter(isDealActive).length;
-    const totalJoined = deals.reduce(
-      (sum, deal) => sum + (Number.isFinite(deal.joined) ? deal.joined : 0),
-      0
-    );
-    const totalOrders = deals.reduce(
-      (sum, deal) => sum + (Number.isFinite(deal.orders) ? deal.orders : 0),
-      0
-    );
+type TabId = (typeof TABS)[number]["id"];
 
-    return { activeDeals, totalJoined, totalOrders };
-  }, [deals]);
-
+function SellerDealRow({ summary }: { summary: DealSummary }) {
+  const { deal } = summary;
   return (
-    <main className="min-h-screen bg-[#f8f8f8] text-slate-900">
-      <nav className="flex h-20 items-center border-b bg-white px-6 lg:px-10">
-        <Link href="/" className="text-2xl font-black">
-          <span className="text-orange-500">Group</span>Buy
-        </Link>
+    <Link
+      href={`/seller/deals/${deal.id}`}
+      className="group block rounded-sheet bg-surface p-5 shadow-sm transition hover:shadow-md sm:p-6"
+    >
+      <div className="flex flex-col gap-5 md:flex-row md:items-center">
+        <div className="flex h-28 w-full shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-surface md:w-32">
+          {summary.cover && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={summary.cover} alt={deal.title} className="h-full w-full object-cover" />
+          )}
+        </div>
 
-        <span className="ml-4 hidden text-sm font-bold text-orange-500 sm:block">
-          Seller Center
-        </span>
+        <div className="min-w-0 flex-1">
+          <DealStatusPill status={deal.status} votingClosed={Boolean(summary.closedReason)} />
+          <h3 className="mt-3 text-xl font-extrabold">{deal.title || "Untitled deal"}</h3>
+          {deal.status === "rejected" && deal.reviewNote && (
+            <p className="mt-1 text-sm text-danger">Admin: {deal.reviewNote}</p>
+          )}
+          <p className="mt-1 text-sm text-muted">
+            {summary.tiers.length} {summary.tiers.length === 1 ? "tier" : "tiers"} from{" "}
+            {summary.tiers[0] ? formatTHB(summary.tiers[0].unitPrice) : "—"} · {deal.votingDays}-day vote
+          </p>
 
-        <Link
-          href="/"
-          className="ml-auto text-sm font-bold hover:text-orange-500"
-        >
-          Home
-        </Link>
-      </nav>
-
-      <div className="mx-auto max-w-6xl px-5 py-10">
-        <p className="text-sm font-bold text-orange-500">SELLER DASHBOARD</p>
-        <h1 className="mt-1 text-4xl font-black">Your group deals</h1>
-        <p className="mt-3 text-gray-500">
-          Track active campaigns and how buyers are joining.
-        </p>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">Active Deals</p>
-            <p className="mt-2 text-3xl font-black text-orange-500">
-              {stats.activeDeals}
+          {deal.status === "seller_decision" && deal.lockedUnitPrice !== null && (
+            <p className="mt-3 text-sm font-bold text-brand-600">
+              {summary.units} units at {formatTHB(deal.lockedUnitPrice)} ·{" "}
+              {deal.decisionDeadline && <Countdown until={deal.decisionDeadline} />} to decide
             </p>
-          </div>
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">Total Joined</p>
-            <p className="mt-2 text-3xl font-black">{stats.totalJoined}</p>
-          </div>
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">Total Orders</p>
-            <p className="mt-2 text-3xl font-black">{stats.totalOrders}</p>
-          </div>
-        </div>
+          )}
 
-        <div className="mt-8 flex items-center justify-between gap-4">
-          <h2 className="text-2xl font-black">My Deals</h2>
-          <Link
-            href="/seller/create"
-            className="rounded-xl bg-orange-500 px-5 py-3 text-sm font-bold text-white hover:bg-orange-600"
-          >
-            + Create Group Deal
-          </Link>
-        </div>
-
-        <div className="mt-6 space-y-5">
-          {deals.map((deal) => {
-            const progress = Math.min((deal.joined / 50) * 100, 100);
-            const currentPrice = getCurrentPrice(deal);
-            const active = isDealActive(deal);
-
-            return (
-              <div
-                key={deal.id}
-                className="rounded-[28px] bg-white p-6 shadow-sm"
-              >
-                <div className="flex flex-col gap-6 md:flex-row md:items-center">
-                  <div className="flex h-32 w-full items-center justify-center overflow-hidden rounded-2xl bg-white md:w-36">
-                    <img
-                      src={deal.image}
-                      alt={deal.name}
-                      className="h-full w-full object-contain p-3"
-                    />
-                  </div>
-
-                  <div className="flex-1">
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-bold ${
-                        active
-                          ? "bg-green-50 text-green-600"
-                          : "bg-gray-100 text-gray-500"
-                      }`}
-                    >
-                      {active ? "● Active" : "Ended"}
-                    </span>
-
-                    <h3 className="mt-3 text-xl font-black">{deal.name}</h3>
-
-                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">
-                      {deal.description}
-                    </p>
-
-                    <p className="mt-3 text-sm text-gray-500">
-                      Current Group Price
-                    </p>
-
-                    <p className="mt-1 text-2xl font-black text-orange-500">
-                      ฿{currentPrice.toLocaleString()}
-                    </p>
-
-                    <div className="mt-5">
-                      <div className="flex justify-between text-xs text-gray-500">
-                        <span>👥 {deal.joined}/50 joined</span>
-                        <span>Ends {deal.endDate}</span>
-                      </div>
-
-                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-100">
-                        <div
-                          className="h-full rounded-full bg-orange-500"
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-gray-200 px-5 py-3 text-center text-sm font-bold text-slate-700">
-                    {deal.orders} orders
-                  </div>
-                </div>
+          {deal.status === "live" && (
+            <div className="mt-4">
+              <TierProgress tiers={summary.tiers} units={summary.units} size="sm" />
+              <div className="mt-2 flex justify-between gap-3 text-xs text-muted">
+                <span>
+                  <Icon name="users" className="mr-1 inline h-3.5 w-3.5 align-[-2px]" />
+                  {summary.units} units · {summary.voters} {summary.voters === 1 ? "buyer" : "buyers"} · now{" "}
+                  {summary.currentTier ? formatTHB(summary.currentTier.unitPrice) : "—"}
+                </span>
+                {deal.votingEndsAt && <Countdown until={deal.votingEndsAt} icon />}
               </div>
-            );
-          })}
+            </div>
+          )}
         </div>
+
+        <span className="inline-flex items-center gap-1 text-sm font-bold text-brand-500">
+          Manage
+          <Icon name="chevron-right" className="h-4 w-4 motion-safe:transition-transform group-hover:translate-x-0.5" />
+        </span>
       </div>
-    </main>
+    </Link>
   );
 }
 
-export default function SellerPage() {
+export default function SellerDashboard() {
+  const db = useDb();
+  const user = useSessionUser();
+  const canSell = useCanSell();
+  const [chosenTab, setTab] = useState<TabId | null>(null);
+
+  const deals = useMemo(() => {
+    if (!db || !user) {
+      return null;
+    }
+    return db.deals
+      .filter((deal) => deal.sellerId === user.id)
+      .map((deal) => dealSummary(db, deal))
+      .sort((a, b) => Date.parse(b.deal.createdAt) - Date.parse(a.deal.createdAt));
+  }, [db, user]);
+
+  const inTab = (id: TabId) =>
+    (deals ?? []).filter((summary) =>
+      (TABS.find((item) => item.id === id)!.statuses as readonly string[]).includes(summary.deal.status)
+    );
+
+  const live = inTab("live");
+  const stats = {
+    live: live.filter((summary) => !summary.closedReason).length,
+    units: live.reduce((sum, summary) => sum + summary.units, 0),
+    review: inTab("review").length,
+    drafts: inTab("drafts").length,
+  };
+  // Open on "Decide now" when a decision is waiting.
+  const tab = chosenTab ?? (inTab("decide").length > 0 ? "decide" : "live");
+  const visible = inTab(tab);
+
   return (
-    <RequireRole role="seller">
-      <SellerDashboard />
-    </RequireRole>
+    <div className="mx-auto max-w-6xl px-5 py-8 lg:py-10">
+      <PageHeader
+        eyebrow="SELLER DASHBOARD"
+        title={user?.shopName ?? "Your group deals"}
+        text="Track your campaigns and how buyers are voting."
+      >
+        {canSell && (
+          <Link
+            href="/seller/create"
+            className="rounded-xl bg-brand-500 px-5 py-3 text-center text-sm font-bold text-white hover:bg-brand-600"
+          >
+            + Create Group Deal
+          </Link>
+        )}
+      </PageHeader>
+
+      <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        {deals ? (
+          <>
+            <StatCard label="Voting now" value={stats.live} tone="brand" />
+            <StatCard label="Units voted" value={stats.units} />
+            <StatCard label="In review" value={stats.review} />
+            <StatCard label="Drafts" value={stats.drafts} />
+          </>
+        ) : (
+          [0, 1, 2, 3].map((index) => <Skeleton key={index} className="h-24" />)
+        )}
+      </div>
+
+      <div role="tablist" aria-label="Deal status" className="mt-8 flex flex-wrap gap-2">
+        {TABS.map((item) => {
+          const selected = tab === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              onClick={() => setTab(item.id)}
+              className={`rounded-full px-4 py-2 text-sm font-bold ${
+                selected ? "bg-ink text-white" : "bg-surface text-muted-strong hover:text-ink"
+              }`}
+            >
+              {item.label} <span className={selected ? "text-brand-300" : "text-subtle"}>{inTab(item.id).length}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-6 space-y-5">
+        {!deals ? (
+          <Skeleton className="h-40" />
+        ) : visible.length === 0 ? (
+          <EmptyState
+            icon={({ decide: "done", live: "rocket", payments: "card", review: "check", drafts: "pencil", ended: "box" } as const)[tab]}
+            title={
+              {
+                decide: "No decisions waiting",
+                live: "No live deals",
+                payments: "No payments in progress",
+                review: "Nothing in review",
+                drafts: "No drafts",
+                ended: "No ended deals yet",
+              }[tab]
+            }
+            text={
+              canSell
+                ? "Create a group deal with price tiers. Once an admin approves it, buyers can start voting."
+                : "You can create deals once your seller application is approved."
+            }
+            action={canSell && (tab === "live" || tab === "drafts") ? { href: "/seller/create", label: "Create a deal" } : undefined}
+          />
+        ) : (
+          visible.map((summary) => <SellerDealRow key={summary.deal.id} summary={summary} />)
+        )}
+      </div>
+    </div>
   );
 }

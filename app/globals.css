@@ -8,8 +8,115 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * Design tokens. Build every screen from these, not from raw palette
+ * classes (orange-*, gray-*, slate-*) or hex values.
+ */
+@theme {
+  /* Brand (orange): primary actions, prices, highlights */
+  --color-brand-50: var(--color-orange-50);
+  --color-brand-100: var(--color-orange-100);
+  --color-brand-200: var(--color-orange-200);
+  --color-brand-300: var(--color-orange-300);
+  --color-brand-400: var(--color-orange-400);
+  --color-brand-500: var(--color-orange-500);
+  --color-brand-600: var(--color-orange-600);
+  --color-brand-700: var(--color-orange-700);
+
+  /* Surfaces */
+  --color-canvas: #f8f8f8;
+  --color-surface: #ffffff;
+  --color-surface-muted: var(--color-gray-100);
+  --color-surface-subtle: var(--color-gray-50);
+  --color-line: var(--color-gray-200);
+
+  /* Text */
+  --color-ink: var(--color-slate-900);
+  --color-ink-soft: var(--color-slate-700);
+  --color-ink-muted: var(--color-slate-600);
+  --color-ink-faint: var(--color-slate-400);
+  --color-muted-strong: var(--color-gray-600);
+  --color-muted: var(--color-gray-500);
+  --color-subtle: var(--color-gray-400);
+
+  /* Status */
+  --color-success-50: var(--color-green-50);
+  --color-success-300: var(--color-green-300);
+  --color-success-600: var(--color-green-600);
+  --color-success-700: var(--color-green-700);
+  --color-danger: var(--color-red-600);
+
+  /* Home hero gradient */
+  --color-hero-from: #fff3e9;
+  --color-hero-via: #fff8f2;
+  --color-hero-to: #ffe6d1;
+
+  /* Radii: rounded-xl for inputs and buttons, rounded-2xl for cards,
+     rounded-3xl for large panels, rounded-full for pills */
+  --radius-sheet: 24px; /* main white content cards and forms */
+  --radius-hero: 28px; /* hero banners and product image panels */
+
+  /* Soft, layered shadows with a hairline edge, so white cards read on the canvas */
+  --shadow-sm: 0 0 0 1px rgb(15 23 42 / 0.04), 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 12px -4px rgb(15 23 42 / 0.06);
+  --shadow-md: 0 0 0 1px rgb(15 23 42 / 0.04), 0 2px 4px rgb(15 23 42 / 0.04), 0 10px 24px -8px rgb(15 23 42 / 0.1);
+  --shadow-lg: 0 0 0 1px rgb(15 23 42 / 0.03), 0 4px 8px rgb(15 23 42 / 0.04), 0 18px 36px -12px rgb(15 23 42 / 0.14);
+  --shadow-xl: 0 0 0 1px rgb(15 23 42 / 0.03), 0 8px 16px rgb(15 23 42 / 0.05), 0 28px 56px -16px rgb(15 23 42 / 0.18);
+
+  /* Motion: always apply with motion-safe: so reduced-motion users get none.
+     "backwards" fill so hover transforms still work after the animation ends. */
+  --animate-rise: rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  --animate-pop: pop 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) backwards;
+  --animate-float: float 3.5s ease-in-out infinite;
+  --animate-celebrate: celebrate 0.9s cubic-bezier(0.3, 1.6, 0.5, 1) backwards;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes pop {
+    0% {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+
+  @keyframes celebrate {
+    0% {
+      transform: scale(0.4) rotate(-12deg);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.15) rotate(6deg);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) rotate(0);
+    }
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +129,35 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* One consistent, visible focus style for keyboard users */
+  :where(a, button, [role="tab"], [role="radio"], summary):focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+    border-radius: 0.75rem;
+  }
+
+  :where(input, select, textarea):focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px var(--color-brand-100);
+  }
+
+  ::selection {
+    background: var(--color-brand-100);
+  }
 }
